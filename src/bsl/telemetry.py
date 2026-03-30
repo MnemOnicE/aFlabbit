@@ -66,7 +66,7 @@ class SystemTelemetry:
                     result.stderr
                 )
                 return False
-            except Exception as e:  # pylint: disable=broad-exception-caught
+            except OSError as e:
                 logger.error("Error executing termux-vibrate: %s", e)
                 return False
 

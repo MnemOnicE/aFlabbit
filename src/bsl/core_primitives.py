@@ -33,7 +33,7 @@ class Primitive(ABC):
         raise NotImplementedError("Subclasses must implement the rollback method.")
 
 
-class Task(Primitive, ABC):
+class Task(Primitive):
     """
     A Task represents a higher-level workflow composed of primitives.
     """
