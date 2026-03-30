@@ -1,5 +1,9 @@
+"""
+Unit tests for the bsl.core_primitives module.
+"""
+
 import unittest
-from typing import Any, Dict
+from typing import Any
 
 from bsl.core_primitives import Primitive, Task
 
@@ -14,10 +18,13 @@ class DummyTask(Task):
 
 
 class TestCorePrimitives(unittest.TestCase):
+    """Test suite for Primitive and Task base classes."""
+
     def test_primitive_abc(self) -> None:
         """Verify that Primitive cannot be instantiated directly."""
         with self.assertRaises(TypeError):
-            Primitive() # type: ignore
+            # pylint: disable=abstract-class-instantiated
+            Primitive()  # type: ignore
 
     def test_task_initialization(self) -> None:
         """Verify Task initializes with correct attributes."""
@@ -42,6 +49,7 @@ class TestCorePrimitives(unittest.TestCase):
             task.execute()
         with self.assertRaises(NotImplementedError):
             task.rollback()
+
 
 if __name__ == '__main__':
     unittest.main()

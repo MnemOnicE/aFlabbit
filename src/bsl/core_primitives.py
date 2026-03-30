@@ -1,5 +1,10 @@
+"""
+Core primitives module defining the foundational classes and workflows
+for the Human Execution Framework.
+"""
+
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 
 class Primitive(ABC):

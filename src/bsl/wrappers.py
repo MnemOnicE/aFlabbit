@@ -1,3 +1,8 @@
+"""
+Wrappers module containing decorators and context managers
+for execution interception and telemetry.
+"""
+
 from typing import Any, Callable, TypeVar, cast
 
 # A generic type variable to represent any callable
@@ -22,6 +27,10 @@ def telemetry_wrapper(func: F) -> F:
         Raises:
             NotImplementedError: As this is a stub.
         """
+        # We access func just to prevent unused variable warnings
+        _ = func
+        _ = args
+        _ = kwargs
         # Placeholder for telemetry logic pre-execution
         raise NotImplementedError("Telemetry wrapper logic not yet implemented.")
         # Placeholder for executing func: result = func(*args, **kwargs)
