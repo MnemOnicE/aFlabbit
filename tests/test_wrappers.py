@@ -6,6 +6,8 @@ import unittest
 from bsl.wrappers import Routine_Wrappers
 
 class TestWrappers(unittest.TestCase):
+    """Test suite ensuring that all wrappers raise NotImplementedError."""
+
     def setUp(self):
         self.wrappers = Routine_Wrappers()
 

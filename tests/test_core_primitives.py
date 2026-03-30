@@ -12,6 +12,8 @@ from bsl.core_primitives import (
 )
 
 class TestCorePrimitives(unittest.TestCase):
+    """Test suite ensuring that all core primitives raise NotImplementedError."""
+
     def setUp(self):
         self.exception_handler = Class0_Exception_Handling()
         self.bootstrapper = Class1_Bootstrapping()

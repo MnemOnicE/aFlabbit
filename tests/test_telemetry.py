@@ -6,6 +6,8 @@ import unittest
 from bsl.telemetry import System_Telemetry
 
 class TestTelemetry(unittest.TestCase):
+    """Test suite ensuring that all telemetry primitives raise NotImplementedError."""
+
     def setUp(self):
         self.telemetry = System_Telemetry()
 

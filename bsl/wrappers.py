@@ -26,7 +26,9 @@ class Routine_Wrappers:
         """
         raise NotImplementedError("This method is not yet implemented")
 
-    def conditional_routine(self, condition_check: Callable[[], bool], routine_true: Callable, routine_false: Callable) -> None:
+    def conditional_routine(
+        self, condition_check: Callable[[], bool], routine_true: Callable, routine_false: Callable
+    ) -> None:
         """
         A higher-level Conditional Boot. Evaluates mid-day state to route entire blocks.
         """
@@ -34,6 +36,7 @@ class Routine_Wrappers:
 
     def anchor_point(self, existing_habit_id: Any, attached_payload: Callable) -> None:
         """
-        Uses an immutable daily event (e.g., "Brushing teeth") as the bootloader for a new payload.
+        Uses an immutable daily event (e.g., "Brushing teeth") as the bootloader
+        for a new payload.
         """
         raise NotImplementedError("This method is not yet implemented")

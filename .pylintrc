@@ -1,0 +1,10 @@
+[MASTER]
+
+[MESSAGES CONTROL]
+# Disable invalid-name to allow custom class names like Class0_Exception_Handling
+# Disable duplicate-code since multiple scaffolded methods have similar docstrings and NotImplementedError bodies
+disable=invalid-name,duplicate-code
+
+[FORMAT]
+# Ensure lines don't exceed 100 characters to prevent C0301
+max-line-length=100
