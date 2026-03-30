@@ -5,7 +5,7 @@ PART 3: TELEMETRY & REINFORCEMENT (Neurological Interface)
 from typing import Any, Callable
 
 
-class System_Telemetry:
+class SystemTelemetry:
     """Tracking progress, enforcing discipline, and reprogramming habits."""
 
     def goal_tracker(self, target_value: float, current_value: float, increment: float) -> None:
