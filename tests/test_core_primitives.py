@@ -1,80 +1,79 @@
 """
-Test suite for BSL Core Primitives
+Test suite for the bsl.core_primitives module.
 """
-
-import unittest
-from bsl.core_primitives import (
-    Class0_Exception_Handling,
-    Class1_Bootstrapping,
-    Class2_Concurrency_IO,
-    Class3_Execution,
-    Class4_Garbage_Collection
-)
-
-class TestCorePrimitives(unittest.TestCase):
-    """Test suite ensuring that all core primitives raise NotImplementedError."""
-
-    def setUp(self):
-        self.exception_handler = Class0_Exception_Handling()
-        self.bootstrapper = Class1_Bootstrapping()
-        self.concurrency = Class2_Concurrency_IO()
-        self.execution = Class3_Execution()
-        self.garbage_collector = Class4_Garbage_Collection()
-
-    def test_method_not_implemented(self):
-        """Test that scaffolding correctly raises NotImplementedError."""
-        with self.assertRaises(NotImplementedError):
-            self.exception_handler.try_catch_finally(lambda: None, lambda: None, lambda: None)
-Unit tests for the bsl.core_primitives module.
-"""
-
 import unittest
 from typing import Any
 
-from bsl.core_primitives import Primitive, Task
+from bsl.core_primitives import Task, Primitive
 
 
-class DummyTask(Task):
-    """A concrete implementation of Task to allow instantiation in tests."""
-    def execute(self, *args: Any, **kwargs: Any) -> Any:
-        return "Executed"
+class MockPrimitive(Primitive):
+    """A mock primitive for testing Task execution."""
+
+    def __init__(self, value: int, should_fail: bool = False):
+        self.value = value
+        self.should_fail = should_fail
+        self.executed = False
+        self.rolled_back = False
+
+    def execute(self, *args: Any, **kwargs: Any) -> int:
+        self.executed = True
+        if self.should_fail:
+            raise ValueError("Intentional failure")
+        return self.value
 
     def rollback(self) -> None:
-        pass
+        self.rolled_back = True
 
 
-class TestCorePrimitives(unittest.TestCase):
-    """Test suite for Primitive and Task base classes."""
+class TestTask(unittest.TestCase):
+    """Test cases for the Task class."""
 
-    def test_primitive_abc(self) -> None:
-        """Verify that Primitive cannot be instantiated directly."""
-        with self.assertRaises(TypeError):
-            # pylint: disable=abstract-class-instantiated
-            Primitive()  # type: ignore
+    def test_task_execution(self):
+        """Test successful task execution and state updates."""
+        task = Task("TestTask")
+        p1 = MockPrimitive(1)
+        p2 = MockPrimitive(2)
 
-    def test_task_initialization(self) -> None:
-        """Verify Task initializes with correct attributes."""
-        task = DummyTask(name="Test Task", description="A test description")
-        self.assertEqual(task.name, "Test Task")
-        self.assertEqual(task.description, "A test description")
-        self.assertEqual(task.status, "PENDING")
-        self.assertEqual(task.get_context(), {})
+        task.add_primitive(p1)
+        task.add_primitive(p2)
 
-    def test_task_context_updates(self) -> None:
-        """Verify context updating and retrieval works."""
-        task = DummyTask(name="Context Task")
-        task.update_context("key1", "value1")
-        self.assertEqual(task.get_context(), {"key1": "value1"})
-        task.update_context("key2", 42)
-        self.assertEqual(task.get_context(), {"key1": "value1", "key2": 42})
+        results = task.execute()
 
-    def test_task_unimplemented_methods(self) -> None:
-        """Verify base Task raises NotImplementedError for execute and rollback."""
-        task = Task(name="Unimplemented Task")
-        with self.assertRaises(NotImplementedError):
+        self.assertEqual(results, [1, 2])
+        self.assertEqual(task.status, "COMPLETED")
+        self.assertTrue(p1.executed)
+        self.assertTrue(p2.executed)
+        self.assertFalse(p1.rolled_back)
+
+    def test_task_rollback_on_failure(self):
+        """Test task rollback mechanism upon primitive failure."""
+        task = Task("FailingTask")
+        p1 = MockPrimitive(1)
+        p2 = MockPrimitive(2, should_fail=True)
+        p3 = MockPrimitive(3)
+
+        task.add_primitive(p1)
+        task.add_primitive(p2)
+        task.add_primitive(p3)
+
+        with self.assertRaises(ValueError):
             task.execute()
-        with self.assertRaises(NotImplementedError):
-            task.rollback()
+
+        self.assertEqual(task.status, "ROLLED_BACK")
+
+        # p1 executed successfully and should be rolled back
+        self.assertTrue(p1.executed)
+        self.assertTrue(p1.rolled_back)
+
+        # p2 executed but failed, no rollback should be called on it since it's
+        # not complete
+        self.assertTrue(p2.executed)
+        self.assertFalse(p2.rolled_back)
+
+        # p3 should never execute
+        self.assertFalse(p3.executed)
+        self.assertFalse(p3.rolled_back)
 
 
 if __name__ == '__main__':
