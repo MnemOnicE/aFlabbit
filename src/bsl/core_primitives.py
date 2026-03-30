@@ -4,7 +4,7 @@ for the Human Execution Framework.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 
 class Primitive(ABC):
@@ -20,7 +20,8 @@ class Primitive(ABC):
         Raises:
             NotImplementedError: If not implemented by a subclass.
         """
-        raise NotImplementedError("Subclasses must implement the execute method.")
+        raise NotImplementedError(
+            "Subclasses must implement the execute method.")
 
     @abstractmethod
     def rollback(self) -> None:
@@ -30,10 +31,11 @@ class Primitive(ABC):
         Raises:
             NotImplementedError: If not implemented by a subclass.
         """
-        raise NotImplementedError("Subclasses must implement the rollback method.")
+        raise NotImplementedError(
+            "Subclasses must implement the rollback method.")
 
 
-class Task(Primitive, ABC):
+class Task(Primitive):
     """
     A Task represents a higher-level workflow composed of primitives.
     """
@@ -50,6 +52,17 @@ class Task(Primitive, ABC):
         self.description: Optional[str] = description
         self.status: str = "PENDING"
         self._context: Dict[str, Any] = {}
+        self._primitives: List['Primitive'] = []
+        self._completed_primitives: List['Primitive'] = []
+
+    def add_primitive(self, primitive: 'Primitive') -> None:
+        """
+        Adds a primitive to the task workflow.
+
+        Args:
+            primitive (Primitive): The primitive to add.
+        """
+        self._primitives.append(primitive)
 
     def get_context(self) -> Dict[str, Any]:
         """
@@ -72,18 +85,38 @@ class Task(Primitive, ABC):
 
     def execute(self, *args: Any, **kwargs: Any) -> Any:
         """
-        Executes the task logic.
+        Executes the task logic by sequentially running all
+        primitives.
+
+        Returns:
+            List[Any]: A list of results from each primitive.
 
         Raises:
-            NotImplementedError: If not implemented by a subclass.
+            Exception: If any primitive fails during execution, triggering a
+            rollback.
         """
-        raise NotImplementedError("Subclasses must implement the execute method.")
+        self.status = "RUNNING"
+        self._completed_primitives.clear()
+        results = []
+        try:
+            for primitive in self._primitives:
+                result = primitive.execute(*args, **kwargs)
+                results.append(result)
+                self._completed_primitives.append(primitive)
+            self.status = "COMPLETED"
+            return results
+        except Exception as error:
+            self.status = "FAILED"
+            self.rollback()
+            raise error
 
     def rollback(self) -> None:
         """
-        Rolls back the task execution.
-
-        Raises:
-            NotImplementedError: If not implemented by a subclass.
+        Rolls back the task execution by invoking rollback on completed
+        primitives in reverse order.
         """
-        raise NotImplementedError("Subclasses must implement the rollback method.")
+        self.status = "ROLLING_BACK"
+        for primitive in reversed(self._completed_primitives):
+            primitive.rollback()
+        self._completed_primitives.clear()
+        self.status = "ROLLED_BACK"

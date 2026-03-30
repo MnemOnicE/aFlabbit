@@ -3,7 +3,12 @@ Wrappers module containing decorators and context managers
 for execution interception and telemetry.
 """
 
-from typing import Any, Callable, TypeVar, cast
+from typing import Any, Callable, TypeVar, cast, Optional, Type
+from types import TracebackType
+import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 # A generic type variable to represent any callable
 F = TypeVar('F', bound=Callable[..., Any])
@@ -23,26 +28,35 @@ def telemetry_wrapper(func: F) -> F:
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         """
         Wrapper implementation for telemetry tracking.
-
-        Raises:
-            NotImplementedError: As this is a stub.
         """
-        # We access func just to prevent unused variable warnings
-        _ = func
-        _ = args
-        _ = kwargs
-        # Placeholder for telemetry logic pre-execution
-        raise NotImplementedError("Telemetry wrapper logic not yet implemented.")
-        # Placeholder for executing func: result = func(*args, **kwargs)
-        # Placeholder for telemetry logic post-execution
-        # return result
+        start_time = time.perf_counter()
+        logger.info("Executing %s...", func.__name__)
+        try:
+            result = func(*args, **kwargs)
+            duration = time.perf_counter() - start_time
+            logger.info(
+                "Execution of %s completed successfully in %.4f seconds.",
+                func.__name__,
+                duration
+            )
+            return result
+        except Exception as error:
+            duration = time.perf_counter() - start_time
+            logger.error(
+                "Execution of %s failed after %.4f seconds: %s",
+                func.__name__,
+                duration,
+                error
+            )
+            raise
     return cast(F, wrapper)
 
 
 class ContextManagerWrapper:
     """
-    A foundational context manager wrapper for ensuring safe execution environments.
+    A foundational context manager wrapper for ensuring safe execution.
     """
+
     def __init__(self, context_name: str) -> None:
         """
         Initializes the context manager wrapper.
@@ -54,23 +68,33 @@ class ContextManagerWrapper:
 
     def __enter__(self) -> 'ContextManagerWrapper':
         """
-        Enters the context.
-
-        Raises:
-            NotImplementedError: As this is a stub.
+        Enters the context safely.
         """
-        raise NotImplementedError("Context entry logic not yet implemented.")
+        logger.info("Entering execution context: %s", self.context_name)
+        return self
 
-    def __exit__(self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException], traceback: Optional[TracebackType]) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType]
+    ) -> None:
         """
-        Exits the context.
+        Exits the context and ensures resources are logged and managed.
 
         Args:
-            exc_type (Any): The type of the exception if raised.
-            exc_value (Any): The exception value if raised.
-            traceback (Any): The exception traceback if raised.
-
-        Raises:
-            NotImplementedError: As this is a stub.
+            exc_type: The type of the exception if raised.
+            exc_value: The exception value if raised.
+            traceback: The exception traceback if raised.
         """
-        raise NotImplementedError("Context exit logic not yet implemented.")
+        if exc_type is not None:
+            logger.error(
+                "Context '%s' exited with an exception: %s: %s",
+                self.context_name,
+                exc_type.__name__,
+                exc_value
+            )
+        else:
+            logger.info(
+                "Successfully exited execution context: %s",
+                self.context_name)

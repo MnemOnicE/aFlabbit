@@ -1,6 +1,6 @@
 """
-Telemetry module handling system-level hardware hooks and telemetry gathering.
-Designed to run well on Android via Termux while supporting any OS via fallbacks.
+Telemetry module handling system-level hardware hooks.
+Designed to run well on Android via Termux with fallbacks.
 """
 
 import subprocess
@@ -13,21 +13,28 @@ logger = logging.getLogger(__name__)
 
 class SystemTelemetry:
     """
-    Handles system-level telemetry and hardware hooks, designed to be terminal-agnostic
-    but robustly supporting Android via Termux.
+    Handles system-level telemetry and hardware hooks, designed
+    to be terminal-agnostic
+    supporting Termux.
     """
 
     def __init__(self) -> None:
         """
-        Initializes the telemetry system and checks for available hardware hooks.
+        Initializes the telemetry system and checks for available
+        hardware hooks.
         """
-        # Dynamically check if the termux-vibrate binary exists on the system path.
-        self._termux_vibrate_path: Optional[str] = shutil.which("termux-vibrate")
+        # Dynamically check if the termux-vibrate binary exists on the system
+        # path.
+        self._termux_vibrate_path: Optional[str] = shutil.which(
+            "termux-vibrate")
 
         if self._termux_vibrate_path:
-            logger.debug("Found termux-vibrate at: %s", self._termux_vibrate_path)
+            logger.debug(
+                "Found termux-vibrate at: %s",
+                self._termux_vibrate_path)
         else:
-            logger.debug("termux-vibrate not found. Haptic feedback will be simulated/logged.")
+            logger.debug(
+                "termux-vibrate not found. Haptic feedback will be simulated.")
 
     def get_vibrate_path(self) -> Optional[str]:
         """
@@ -43,15 +50,16 @@ class SystemTelemetry:
         If not, it logs the event and returns gracefully.
 
         Args:
-            duration_ms (int): The duration of the vibration in milliseconds. Defaults to 100.
+            duration_ms (int): The duration of the vibration in milliseconds.
 
         Returns:
-            bool: True if the actual hardware vibration command was successfully dispatched,
-                  False if it was simulated/logged or if the command failed.
+            bool: True if vibration command was successfully dispatched,
+                  False if simulated or if the command failed.
         """
         if self._termux_vibrate_path:
             try:
-                # Dispatch the command, non-blocking if possible, wait to check return code.
+                # Dispatch the command, non-blocking if possible, wait to check
+                # return code.
                 result = subprocess.run(
                     [self._termux_vibrate_path, "-d", str(duration_ms)],
                     capture_output=True,

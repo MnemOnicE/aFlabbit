@@ -1,20 +1,4 @@
 """
-Test suite for BSL Telemetry
-"""
-
-import unittest
-from bsl.telemetry import System_Telemetry
-
-class TestTelemetry(unittest.TestCase):
-    """Test suite ensuring that all telemetry primitives raise NotImplementedError."""
-
-    def setUp(self):
-        self.telemetry = System_Telemetry()
-
-    def test_method_not_implemented(self):
-        """Test that scaffolding correctly raises NotImplementedError."""
-        with self.assertRaises(NotImplementedError):
-            self.telemetry.haptic_feedback("100,50,100")
 Unit tests for the bsl.telemetry module.
 """
 
@@ -28,25 +12,31 @@ class TestTelemetry(unittest.TestCase):
     """Test suite for the SystemTelemetry hardware hooks and fallbacks."""
 
     @patch('shutil.which')
-    def test_init_without_termux(self, mock_which: MagicMock) -> None:
-        """Verify initialization handles missing termux-vibrate gracefully."""
+    def test_init_without_termux(
+        self, mock_which: MagicMock
+    ) -> None:
+        """Verify initialization handles missing termux-vibrate."""
         mock_which.return_value = None
         telemetry = SystemTelemetry()
         self.assertIsNone(telemetry.get_vibrate_path())
 
     @patch('shutil.which')
-    def test_init_with_termux(self, mock_which: MagicMock) -> None:
+    def test_init_with_termux(
+        self, mock_which: MagicMock
+    ) -> None:
         """Verify initialization finds termux-vibrate."""
-        mock_which.return_value = '/data/data/com.termux/files/usr/bin/termux-vibrate'
+        mock_which.return_value = '/data/data/com.termux/bin/vibrate'
         telemetry = SystemTelemetry()
         self.assertEqual(
             telemetry.get_vibrate_path(),
-            '/data/data/com.termux/files/usr/bin/termux-vibrate'
+            '/data/data/com.termux/bin/vibrate'
         )
 
     @patch('shutil.which')
-    def test_haptic_fallback(self, mock_which: MagicMock) -> None:
-        """Verify haptic feedback returns False (simulated) when termux-vibrate is missing."""
+    def test_haptic_fallback(
+        self, mock_which: MagicMock
+    ) -> None:
+        """Verify haptic fallback to False when missing."""
         mock_which.return_value = None
         telemetry = SystemTelemetry()
 
@@ -55,20 +45,24 @@ class TestTelemetry(unittest.TestCase):
             result = telemetry.haptic_feedback(duration_ms=150)
 
         self.assertFalse(result)
-        self.assertTrue(any("SIMULATED HAPTIC" in log for log in cm.output))
+        self.assertTrue(
+            any("SIMULATED HAPTIC" in log for log in cm.output)
+        )
 
     @patch('shutil.which')
     @patch('subprocess.run')
-    def test_haptic_success(self, mock_subprocess_run: MagicMock, mock_which: MagicMock) -> None:
-        """Verify haptic feedback returns True when termux-vibrate succeeds."""
+    def test_haptic_success(
+        self, mock_run: MagicMock, mock_which: MagicMock
+    ) -> None:
+        """Verify haptic feedback returns True when termux-vibrate works."""
         mock_which.return_value = '/fake/bin/termux-vibrate'
-        mock_subprocess_run.return_value = MagicMock(returncode=0)
+        mock_run.return_value = MagicMock(returncode=0)
 
         telemetry = SystemTelemetry()
         result = telemetry.haptic_feedback(duration_ms=200)
 
         self.assertTrue(result)
-        mock_subprocess_run.assert_called_once_with(
+        mock_run.assert_called_once_with(
             ['/fake/bin/termux-vibrate', '-d', '200'],
             capture_output=True,
             text=True,
@@ -77,10 +71,14 @@ class TestTelemetry(unittest.TestCase):
 
     @patch('shutil.which')
     @patch('subprocess.run')
-    def test_haptic_failure(self, mock_subprocess_run: MagicMock, mock_which: MagicMock) -> None:
-        """Verify haptic feedback returns False when termux-vibrate process fails."""
+    def test_haptic_failure(
+        self, mock_run: MagicMock, mock_which: MagicMock
+    ) -> None:
+        """Verify haptic feedback returns False when vibrate fails."""
         mock_which.return_value = '/fake/bin/termux-vibrate'
-        mock_subprocess_run.return_value = MagicMock(returncode=1, stderr="Failed to vibrate")
+        mock_run.return_value = MagicMock(
+            returncode=1, stderr="Failed to vibrate"
+        )
 
         telemetry = SystemTelemetry()
 
@@ -88,7 +86,8 @@ class TestTelemetry(unittest.TestCase):
             result = telemetry.haptic_feedback()
 
         self.assertFalse(result)
-        self.assertTrue(any("termux-vibrate failed" in log for log in cm.output))
+        self.assertTrue(
+            any("termux-vibrate failed" in log for log in cm.output))
 
 
 if __name__ == '__main__':
