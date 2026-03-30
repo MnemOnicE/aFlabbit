@@ -5,7 +5,7 @@ PART 1: THE CORE PRIMITIVES (Control Flow & Entropy Management)
 from typing import Any, Callable, List, Dict
 
 
-class Class0_Exception_Handling:
+class Class0ExceptionHandling:
     """RED / HIGH ENTROPY: System crash prevention and graceful exits."""
 
     def try_catch_finally(self, payload: Callable, fallback: Callable, cleanup: Callable) -> Any:
