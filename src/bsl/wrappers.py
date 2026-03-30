@@ -29,11 +29,11 @@ def telemetry_wrapper(func: F) -> F:
         """
         Wrapper implementation for telemetry tracking.
         """
-        start_time = time.time()
+        start_time = time.perf_counter()
         logger.info("Executing %s...", func.__name__)
         try:
             result = func(*args, **kwargs)
-            duration = time.time() - start_time
+            duration = time.perf_counter() - start_time
             logger.info(
                 "Execution of %s completed successfully in %.4f seconds.",
                 func.__name__,
@@ -41,7 +41,7 @@ def telemetry_wrapper(func: F) -> F:
             )
             return result
         except Exception as error:
-            duration = time.time() - start_time
+            duration = time.perf_counter() - start_time
             logger.error(
                 "Execution of %s failed after %.4f seconds: %s",
                 func.__name__,
