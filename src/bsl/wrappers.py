@@ -3,7 +3,8 @@ Wrappers module containing decorators and context managers
 for execution interception and telemetry.
 """
 
-from typing import Any, Callable, TypeVar, cast
+from typing import Any, Callable, TypeVar, cast, Optional, Type
+from types import TracebackType
 
 # A generic type variable to represent any callable
 F = TypeVar('F', bound=Callable[..., Any])
@@ -61,7 +62,12 @@ class ContextManagerWrapper:
         """
         raise NotImplementedError("Context entry logic not yet implemented.")
 
-    def __exit__(self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException], traceback: Optional[TracebackType]) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType]
+    ) -> None:
         """
         Exits the context.
 
