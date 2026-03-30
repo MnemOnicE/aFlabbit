@@ -5,7 +5,7 @@ PART 2: ROUTINE WRAPPERS & SCHEDULING (Dynamic Flow Structures)
 from typing import Any, Callable, List
 
 
-class Routine_Wrappers:
+class RoutineWrappers:
     """Constructs that package Primitives into actionable daily flows."""
 
     def reoccurring_routine(self, cron_schedule: str, payload: Callable) -> None:
