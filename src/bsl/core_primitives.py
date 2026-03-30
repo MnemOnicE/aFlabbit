@@ -96,6 +96,7 @@ class Task(Primitive):
             rollback.
         """
         self.status = "RUNNING"
+        self._completed_primitives.clear()
         results = []
         try:
             for primitive in self._primitives:
