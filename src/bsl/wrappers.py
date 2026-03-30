@@ -61,7 +61,7 @@ class ContextManagerWrapper:
         """
         raise NotImplementedError("Context entry logic not yet implemented.")
 
-    def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
+    def __exit__(self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException], traceback: Optional[TracebackType]) -> None:
         """
         Exits the context.
 
