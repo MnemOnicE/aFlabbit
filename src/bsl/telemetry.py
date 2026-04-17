@@ -55,7 +55,16 @@ class SystemTelemetry:
         Returns:
             bool: True if vibration command was successfully dispatched,
                   False if simulated or if the command failed.
+
+        Raises:
+            ValueError: If duration_ms is not between 1 and 10000.
+            TypeError: If duration_ms is not an integer.
         """
+        if not isinstance(duration_ms, int):
+            raise TypeError("duration_ms must be an integer")
+        if not 1 <= duration_ms <= 10000:
+            raise ValueError("duration_ms must be between 1 and 10000")
+
         if self._termux_vibrate_path:
             try:
                 # Dispatch the command, non-blocking if possible, wait to check

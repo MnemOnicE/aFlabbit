@@ -75,6 +75,36 @@ class TestTask(unittest.TestCase):
         self.assertFalse(p3.executed)
         self.assertFalse(p3.rolled_back)
 
+    def test_task_rollback_resilience(self):
+        """Test that a failing rollback doesn't stop subsequent rollbacks."""
+        task = Task("ResilientRollbackTask")
+
+        class FailingRollbackPrimitive(MockPrimitive):
+            """Mock primitive that fails on rollback."""
+
+            def rollback(self) -> None:
+                super().rollback()
+                raise RuntimeError("Intentional rollback failure")
+
+        p1 = MockPrimitive(1)
+        p2 = FailingRollbackPrimitive(2)
+        p3 = MockPrimitive(3, should_fail=True)
+
+        task.add_primitive(p1)
+        task.add_primitive(p2)
+        task.add_primitive(p3)
+
+        with self.assertRaises(ValueError):
+            task.execute()
+
+        self.assertEqual(task.status, "ROLLED_BACK")
+
+        # p2's rollback failed, but p1 should still be rolled back
+        self.assertTrue(p2.executed)
+        self.assertTrue(p2.rolled_back)
+        self.assertTrue(p1.executed)
+        self.assertTrue(p1.rolled_back)
+
 
 if __name__ == '__main__':
     unittest.main()

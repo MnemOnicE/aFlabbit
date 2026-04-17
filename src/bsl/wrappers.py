@@ -7,6 +7,7 @@ from typing import Any, Callable, TypeVar, cast, Optional, Type
 from types import TracebackType
 import time
 import logging
+import functools
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ def telemetry_wrapper(func: F) -> F:
     Returns:
         F: The wrapped function.
     """
+    @functools.wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         """
         Wrapper implementation for telemetry tracking.
@@ -46,7 +48,7 @@ def telemetry_wrapper(func: F) -> F:
                 "Execution of %s failed after %.4f seconds: %s",
                 func.__name__,
                 duration,
-                error
+                str(error)
             )
             raise
     return cast(F, wrapper)
@@ -92,7 +94,7 @@ class ContextManagerWrapper:
                 "Context '%s' exited with an exception: %s: %s",
                 self.context_name,
                 exc_type.__name__,
-                exc_value
+                str(exc_value)
             )
         else:
             logger.info(
