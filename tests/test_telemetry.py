@@ -89,6 +89,28 @@ class TestTelemetry(unittest.TestCase):
         self.assertTrue(
             any("termux-vibrate failed" in log for log in cm.output))
 
+    def test_haptic_feedback_validation(self):
+        """Test boundary validation for haptic_feedback duration_ms."""
+        telemetry = SystemTelemetry()
+
+        # Test valid inputs (should simulate)
+        self.assertFalse(telemetry.haptic_feedback(1))
+        self.assertFalse(telemetry.haptic_feedback(10000))
+
+        # Test type error
+        with self.assertRaises(TypeError):
+            telemetry.haptic_feedback("100")  # type: ignore
+        with self.assertRaises(TypeError):
+            telemetry.haptic_feedback(100.5)  # type: ignore
+
+        # Test value error
+        with self.assertRaises(ValueError):
+            telemetry.haptic_feedback(0)
+        with self.assertRaises(ValueError):
+            telemetry.haptic_feedback(-100)
+        with self.assertRaises(ValueError):
+            telemetry.haptic_feedback(10001)
+
 
 if __name__ == '__main__':
     unittest.main()

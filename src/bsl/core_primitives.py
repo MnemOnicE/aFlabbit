@@ -4,7 +4,10 @@ for the Human Execution Framework.
 """
 
 from abc import ABC, abstractmethod
+import logging
 from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 class Primitive(ABC):
@@ -117,6 +120,12 @@ class Task(Primitive):
         """
         self.status = "ROLLING_BACK"
         for primitive in reversed(self._completed_primitives):
-            primitive.rollback()
+            try:
+                primitive.rollback()
+            except Exception:  # pylint: disable=broad-exception-caught
+                logger.exception(
+                    "Error rolling back primitive %s",
+                    primitive.__class__.__name__
+                )
         self._completed_primitives.clear()
         self.status = "ROLLED_BACK"

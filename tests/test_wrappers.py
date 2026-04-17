@@ -40,6 +40,17 @@ class TestWrappers(unittest.TestCase):
         except RuntimeError:
             pass
 
+    def test_telemetry_wrapper_dx(self):
+        """Test that telemetry_wrapper preserves function metadata for DX."""
+        @telemetry_wrapper
+        def sample_function() -> str:
+            """This is a sample docstring."""
+            return "ok"
+
+        self.assertEqual(sample_function.__name__, "sample_function")
+        self.assertEqual(
+            sample_function.__doc__, "This is a sample docstring.")
+
 
 if __name__ == '__main__':
     unittest.main()
