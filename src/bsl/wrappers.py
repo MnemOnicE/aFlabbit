@@ -94,7 +94,7 @@ class ContextManagerWrapper:
                 "Context '%s' exited with an exception: %s: %s",
                 self.context_name,
                 exc_type.__name__,
-                str(exc_value)
+                exc_value
             )
         else:
             logger.info(
