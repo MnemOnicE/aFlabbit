@@ -48,7 +48,7 @@ def telemetry_wrapper(func: F) -> F:
                 "Execution of %s failed after %.4f seconds: %s",
                 func.__name__,
                 duration,
-                str(error)
+                error
             )
             raise
     return cast(F, wrapper)
