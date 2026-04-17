@@ -89,7 +89,8 @@ class TestTermuxAPI(unittest.TestCase):
             ['/fake/bin/termux-battery-status'],
             capture_output=True,
             text=True,
-            check=False
+            check=False,
+            timeout=5
         )
 
     @patch('shutil.which')
@@ -140,7 +141,8 @@ class TestTermuxAPI(unittest.TestCase):
             expected_cmd,
             capture_output=True,
             text=True,
-            check=False
+            check=False,
+            timeout=10
         )
 
     @patch('shutil.which')
@@ -183,7 +185,8 @@ class TestTermuxAPI(unittest.TestCase):
             ['/fake/bin/termux-sensor', '-s', 'ACCELEROMETER', '-n', '1'],
             capture_output=True,
             text=True,
-            check=False
+            check=False,
+            timeout=10
         )
 
     @patch('shutil.which')

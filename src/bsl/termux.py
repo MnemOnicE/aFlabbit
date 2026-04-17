@@ -47,7 +47,8 @@ class TermuxAPI:
                 [self._termux_battery],
                 capture_output=True,
                 text=True,
-                check=False
+                check=False,
+                timeout=5
             )
             if result.returncode == 0:
                 return json.loads(result.stdout)
@@ -94,7 +95,8 @@ class TermuxAPI:
                 cmd,
                 capture_output=True,
                 text=True,
-                check=False
+                check=False,
+                timeout=10
             )
             if result.returncode == 0:
                 return json.loads(result.stdout)
@@ -138,7 +140,8 @@ class TermuxAPI:
                 cmd,
                 capture_output=True,
                 text=True,
-                check=False
+                check=False,
+                timeout=10
             )
             if result.returncode == 0:
                 return json.loads(result.stdout)
