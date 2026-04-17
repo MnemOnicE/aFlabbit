@@ -48,7 +48,7 @@ def telemetry_wrapper(func: F) -> F:
                 "Execution of %s failed after %.4f seconds: %s",
                 func.__name__,
                 duration,
-                error
+                str(error)
             )
             raise
     return cast(F, wrapper)
@@ -94,7 +94,7 @@ class ContextManagerWrapper:
                 "Context '%s' exited with an exception: %s: %s",
                 self.context_name,
                 exc_type.__name__,
-                exc_value
+                str(exc_value)
             )
         else:
             logger.info(

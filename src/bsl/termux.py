@@ -46,8 +46,8 @@ def _run_termux_cmd(cmd: str, *args: str) -> Optional[str]:
             result.stderr.strip()
         )
         return None
-    except Exception:  # pylint: disable=broad-exception-caught
-        logger.exception("Error executing %s", cmd)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Error executing %s: %s", cmd, str(e))
         return None
 
 
