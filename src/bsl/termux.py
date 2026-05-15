@@ -49,8 +49,8 @@ def _run_termux_cmd(cmd: str, *args: str) -> Optional[str]:
             result.stderr.strip()
         )
         return None
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        logger.error("Error executing %s: %s", cmd, str(e))
+    except (subprocess.SubprocessError, OSError, json.JSONDecodeError):
+        logger.exception("Error executing %s", cmd)
         return None
 
 
@@ -98,8 +98,8 @@ class TermuxAPI:
                 result.returncode,
                 result.stderr
             )
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            logger.error("Error executing termux-battery-status: %s", e)
+        except (subprocess.SubprocessError, OSError, json.JSONDecodeError):
+            logger.exception("Error executing termux-battery-status")
         return None
 
     def show_dialog(
@@ -148,8 +148,8 @@ class TermuxAPI:
                 result.returncode,
                 result.stderr
             )
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            logger.error("Error executing termux-dialog: %s", e)
+        except (subprocess.SubprocessError, OSError, json.JSONDecodeError):
+            logger.exception("Error executing termux-dialog")
         return None
 
     def get_sensors(
@@ -196,6 +196,6 @@ class TermuxAPI:
                 result.returncode,
                 result.stderr
             )
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            logger.error("Error executing termux-sensor: %s", e)
+        except (subprocess.SubprocessError, OSError, json.JSONDecodeError):
+            logger.exception("Error executing termux-sensor")
         return None

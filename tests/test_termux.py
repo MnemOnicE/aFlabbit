@@ -113,13 +113,15 @@ class TestTermuxAPI(unittest.TestCase):
         with self.assertRaises(ValueError):
             termux.get_sensors("   ")
         with self.assertRaises(ValueError):
-            termux.get_sensors(123)  # type: ignore
+            invalid_input = 123
+            termux.get_sensors(invalid_input)
 
     def test_show_dialog_validation(self):
         """Test input validation for show_dialog."""
         termux = TermuxAPI()
         with self.assertRaises(TypeError):
-            termux.show_dialog(123)  # type: ignore
+            invalid_input = 123
+            termux.show_dialog(invalid_input)
 
     @patch('shutil.which')
     def test_dialog_fallback(self, mock_which: MagicMock) -> None:
